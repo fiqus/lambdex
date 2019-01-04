@@ -25,4 +25,25 @@ defmodule LambdexCore do
 
     LambdexCore.LambdaExecution.run_sync(pid)
   end
+
+  @doc """
+  Run asynchronously a lambda function
+
+  ## Examples
+
+      iex> LambdexCore.run_async("fn -> :hello_lambda end", %{})
+      :ok
+  """
+  def run_async(lambda_source, lambda_envs, lambda_params \\ [])
+  def run_async(lambda_source, lambda_envs, nil), do: run_async(lambda_source, lambda_envs, [])
+  def run_async(lambda_source, lambda_envs, lambda_params) when is_map(lambda_params) and map_size(lambda_params) == 0, do: run_async(lambda_source, lambda_envs, [])
+  def run_async(lambda_source, lambda_envs, lambda_params) when is_binary(lambda_source) do
+    {:ok, pid} =
+      DynamicSupervisor.start_child(
+        LambdexCore.ExecutionSupervisor,
+        {LambdexCore.LambdaExecution, {lambda_source, lambda_envs, lambda_params}}
+      )
+
+    LambdexCore.LambdaExecution.run_async(pid)
+  end
 end

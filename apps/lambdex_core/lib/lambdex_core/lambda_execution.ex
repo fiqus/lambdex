@@ -21,6 +21,19 @@ defmodule LambdexCore.LambdaExecution do
 
   @impl true
   def handle_call(:run, _from, state) do
+    execution = run_lambda(state)
+
+    {:reply, execution, %{state | execution: execution}}
+  end
+
+  @impl true
+  def handle_cast(:run, state) do
+    execution = run_lambda(state)
+
+    {:noreply, %{state | execution: execution}}
+  end
+
+  defp run_lambda(state) do
     start_time = System.monotonic_time(:milliseconds)
     at_time = :os.system_time(:seconds)
 
@@ -35,16 +48,19 @@ defmodule LambdexCore.LambdaExecution do
 
     duration = System.monotonic_time(:milliseconds) - start_time
     reductions = get_process_reduction_count()
-    execution =
-      state.execution
-      |> Execution.put_executed_at(at_time)
-      |> Execution.put_duration(duration)
-      |> Execution.put_reductions(reductions)
-      |> Execution.put_result(result)
-      |> Execution.put_params(state.lambda_params)
-      |> Execution.put_envs(state.lambda_envs)
 
-    {:reply, execution, %{state | execution: execution}}
+    state.execution
+    |> Execution.put_executed_at(at_time)
+    |> Execution.put_duration(duration)
+    |> Execution.put_reductions(reductions)
+    |> Execution.put_result(result)
+    |> Execution.put_params(state.lambda_params)
+    |> Execution.put_envs(state.lambda_envs)
+  end
+
+  defp get_process_reduction_count() do
+    {:ok, reductions} = Keyword.fetch(:erlang.process_info(self()), :reductions)
+    reductions
   end
 
   ############
@@ -55,12 +71,7 @@ defmodule LambdexCore.LambdaExecution do
     GenServer.call(pid, :run)
   end
 
-  # def start_supervised_task(lambda) do
-  #   Task.Supervisor.async_nolink(LambdexCore.LambdaTaskSupervisor, lambda.code, lambda.params)
-  # end
-
-  defp get_process_reduction_count() do
-    {:ok, reductions} = Keyword.fetch(:erlang.process_info(self()), :reductions)
-    reductions
+  def run_async(pid) do
+    GenServer.cast(pid, :run)
   end
 end
