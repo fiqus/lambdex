@@ -44,7 +44,7 @@ defmodule LambdexServerWeb.UserController do
   def token(conn, %{"data" => %{"email" => email, "password" => password}}) do
     with {:ok, user} <- LambdexServer.Auth.authenticate_user(email, password),
          claims <- %{},
-         {:ok, token, claims} <-
+         {:ok, token, _claims} <-
            LambdexServer.Auth.Guardian.encode_and_sign(user, claims, ttl: {24, :hours}) do
       render(conn, "token.json", token: token)
     end

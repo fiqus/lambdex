@@ -70,7 +70,7 @@ defmodule LambdexServer.Lambdas do
   """
   def get_lambda!(user_id, id) do
     query = from(l in Lambda, where: [user_id: ^user_id, id: ^id])
-    add_detailed_execution_data(Repo.one(query))
+    add_detailed_execution_data(Repo.one!(query))
   end
 
   def get_lambda_by_path!(user_id, path) do
@@ -197,18 +197,13 @@ defmodule LambdexServer.Lambdas do
 
   ## Examples
 
-      iex> list_lambda_executions(user.id)
+      iex> list_lambda_executions(user.id, lambda_id)
       [%LambdaExecution{}, ...]
 
   """
-  def list_lambda_executions(user_id) do
-    query = from(le in LambdaExecution, where: [user_id: ^user_id])
-    Repo.all(query)
-  end
-
   def list_lambda_executions(user_id, lambda_id) do
     query = from(l in Lambda, where: [user_id: ^user_id, id: ^lambda_id])
-    lambda = Repo.one!(query)
+    _lambda = Repo.one!(query)
     query = from(le in LambdaExecution, where: [lambda_id: ^lambda_id], order_by: [desc: le.inserted_at])
     Repo.all(query)
   end

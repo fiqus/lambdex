@@ -38,7 +38,7 @@ defmodule Lambdex.MixProject do
       {:redix, "~> 0.9.0"},
       {:sweet_xml, "~> 0.6.5"},
       {:uuid, "~> 1.1"},
-      {:yamerl, "~> 0.7.0"},
+      {:yamerl, "~> 0.7.0"}
     ]
   end
 

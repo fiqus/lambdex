@@ -6,10 +6,10 @@ defmodule LambdexServerWeb.LambdaExecutionController do
 
   action_fallback LambdexServerWeb.FallbackController
 
-  def index(conn, _params) do
-    lambda_executions = Lambdas.list_lambda_executions(conn.assigns.current_user.id)
-    render(conn, "index.json", lambda_executions: lambda_executions)
-  end
+  # def index(conn, _params) do
+  #   lambda_executions = Lambdas.list_lambda_executions(conn.assigns.current_user.id)
+  #   render(conn, "index.json", lambda_executions: lambda_executions)
+  # end
 
   def create(conn, %{"lambda_execution" => lambda_execution_params}) do
     with {:ok, %LambdaExecution{} = lambda_execution} <-

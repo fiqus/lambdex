@@ -27,7 +27,7 @@ defmodule LambdexServerWeb.FallbackController do
     |> render(:"403")
   end
 
-  def call(conn, {:error, reason}) do
+  def call(conn, {:error, _reason}) do
     conn
     |> put_status(400)
     |> put_view(LambdexServerWeb.ErrorView)
